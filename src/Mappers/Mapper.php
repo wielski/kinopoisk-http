@@ -15,10 +15,12 @@ abstract class Mapper
     /**
      * Mapper constructor.
      * @param $content
+     * @param null $url
+     * @param null $base_href
      */
-    function __construct($content)
+    function __construct($content, $url = null, $base_href = null)
     {
-        $this->crawler = new Crawler($content);
+        $this->crawler = new Crawler($content, $url, $base_href);
     }
 
     /**

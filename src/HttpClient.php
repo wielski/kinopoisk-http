@@ -4,6 +4,7 @@ namespace Siqwell\Kinopoisk;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\TransferStats;
 use Illuminate\Support\Facades\Cache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\LaravelCacheStorage;
@@ -28,10 +29,10 @@ class HttpClient extends Client
      */
     public function __construct(array $config = [])
     {
-        $handler = HandlerStack::create();
+        $stack = HandlerStack::create();
 
-        $handler->push($this->cacheMiddleware(), 'cache');
-        $handler->push($this->charsetMiddleware(), 'charset');
+        $stack->push($this->cacheMiddleware(), 'cache');
+        $stack->push($this->charsetMiddleware(), 'charset');
 
         $config = array_merge([
             'headers' => [
@@ -40,7 +41,8 @@ class HttpClient extends Client
                 'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Language' => 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
             ],
-            'handler' => $handler,
+            'allow_redirects' => true,
+            'handler'         => $stack,
         ], $config);
 
         parent::__construct($config);

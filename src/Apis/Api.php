@@ -2,6 +2,7 @@
 
 namespace Siqwell\Kinopoisk\Apis;
 
+use GuzzleHttp\Psr7\Uri;
 use Illuminate\Support\Str;
 use Siqwell\Kinopoisk\HttpClient;
 use Siqwell\Kinopoisk\Mappers\Mapper;
@@ -58,9 +59,10 @@ abstract class Api
 
     /**
      * @param $result
+     * @param null $url
      * @return mixed
      */
-    public function callMap($result)
+    public function callMap($result, $url = null)
     {
         if ($this->mapper instanceof \Closure) {
             return call_user_func_array($this->mapper, [$result]);
@@ -68,7 +70,11 @@ abstract class Api
 
         if (is_string($this->mapper) && class_exists($this->mapper)) {
             if (is_subclass_of($this->mapper, Mapper::class, true)) {
-                return app($this->mapper, ['content' => $result])->get();
+                return app($this->mapper, [
+                    'content'   => $result,
+                    'url'       => $url,
+                    'base_href' => $this->client->getConfig('base_uri')
+                ])->get();
             }
         }
     }
@@ -97,7 +103,7 @@ abstract class Api
         }
 
         if ($content = $response->getBody()->getContents()) {
-            return $this->isMapped() ? $this->callMap($content) : $content;
+            return $this->isMapped() ? $this->callMap($content, $url) : $content;
         }
 
         return false;
@@ -112,15 +118,16 @@ abstract class Api
     {
         $pattern = $pattern ?: $this->pattern;
 
-        if (!count($variables)) {
-            return $pattern;
+        if (count($variables)) {
+            foreach ($variables as $key => $value) {
+                $pattern = Str::replaceFirst('{' . $key . '}', $value, $pattern);
+            }
         }
 
-        foreach ($variables as $key => $value) {
-            $pattern = Str::replaceFirst('{' . $key . '}', $value, $pattern);
-        }
+        /* @var Uri $uri */
+        $uri = $this->client->getConfig('base_uri');
 
-        return $pattern;
+        return (string)$uri->withPath($pattern);
     }
 
     /**
