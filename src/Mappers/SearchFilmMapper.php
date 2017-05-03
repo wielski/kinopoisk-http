@@ -15,6 +15,14 @@ class SearchFilmMapper extends Mapper
 {
 
     /**
+     * @var array
+     */
+    protected $types = [
+        'series' => 'tv',
+        'film'   => 'movie',
+    ];
+
+    /**
      * @var Collection
      */
     protected $result;
@@ -26,11 +34,11 @@ class SearchFilmMapper extends Mapper
     {
         $this->result = collect();
 
-        $this->crawler->filter('.search_results .element')->each(function (Crawler $node, $index) {
+        $this->crawler->filter('.search_results .element')->each(function (Crawler $node) {
             $this->result->push(
                 new Film([
                     'id'       => $node->filter('.pic a')->attr('data-id'),
-                    'type'     => $node->filter('.pic a')->attr('data-type'),
+                    'type'     => $this->detectType($node->filter('.pic a')->attr('data-type')),
                     'title'    => $node->filter('.pic a img')->attr('alt'),
                     'original' => $this->original($node),
                     'year'     => $node->filter('.info .name .year')->text(),
@@ -40,6 +48,15 @@ class SearchFilmMapper extends Mapper
         });
 
         return $this->result;
+    }
+
+    /**
+     * @param string $type
+     * @return mixed|null
+     */
+    private function detectType(string $type)
+    {
+        return isset($this->types[$type]) ? $this->types[$type] : null;
     }
 
     /**
