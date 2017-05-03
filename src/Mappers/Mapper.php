@@ -24,5 +24,5 @@ abstract class Mapper
     /**
      * @return mixed
      */
-    abstract function get();
+    abstract public function get();
 }

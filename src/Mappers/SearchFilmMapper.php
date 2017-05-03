@@ -12,7 +12,7 @@ class SearchFilmMapper extends Mapper
     /**
      * @return mixed
      */
-    function get()
+    public function get()
     {
         dd($this->crawler->html());
     }

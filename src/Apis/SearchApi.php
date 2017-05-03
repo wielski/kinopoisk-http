@@ -42,7 +42,7 @@ class SearchApi extends Api
      */
     public function searchName(string $name, array $params = [])
     {
-        $this->pattern = Mact::query('type', 'film', $this->pattern);
+        $this->pattern = Mact::query('type', 'name', $this->pattern);
         $this->pattern = Mact::query('list', '1', $this->pattern);
         $this->pattern = Mact::query('find', $name, $this->pattern);
 
