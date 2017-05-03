@@ -20,6 +20,7 @@ class SearchApi extends Api
     /**
      * @param string $title
      * @param array $params
+     * @return string
      */
     public function searchFilm(string $title, array $params = [])
     {
@@ -33,7 +34,7 @@ class SearchApi extends Api
 
         $result = $this->setMapper(SearchFilmMapper::class)->get();
 
-        dd($result);
+        return $result;
     }
 
     /**
