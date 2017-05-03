@@ -14,17 +14,55 @@ class FilmDetailsMapper extends Mapper
 {
 
     /**
+     * @var array
+     */
+    protected $types = [
+        'video.tv_show' => 'tv',
+        'video.movie'   => 'movie',
+    ];
+
+    /**
      * @return mixed
      */
     public function get()
     {
         return new Film([
+            'id'       => $this->detectId(),
+            'type'     => $this->detectType(),
             'title'    => $this->parseTitle(),
             'original' => $this->parseOriginalTitle(),
             'tagline'  => $this->parseTagline(),
             'runtime'  => $this->parseRuntime(),
             'premiere' => $this->parsePremiere(),
         ]);
+    }
+
+    /**
+     * @return mixed|null
+     */
+    private function detectId()
+    {
+        try {
+            if ($canonical = $this->crawler->filterXPath("//link[@rel='canonical']/@href")->text()) {
+                return collect(explode('/', trim($canonical, '/')))->last();
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return mixed|null
+     */
+    private function detectType()
+    {
+        try {
+            if ($type = $this->crawler->filterXPath("//meta[@property='og:type']/@content")->text()) {
+                return isset($this->types[$type]) ? $this->types[$type] : null;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
