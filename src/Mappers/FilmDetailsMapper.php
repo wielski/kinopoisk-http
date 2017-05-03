@@ -28,13 +28,15 @@ class FilmDetailsMapper extends Mapper
     {
         if ($this->detectId()) {
             return new Film([
-                'id'       => $this->detectId(),
-                'type'     => $this->detectType(),
-                'title'    => $this->parseTitle(),
-                'original' => $this->parseOriginalTitle(),
-                'tagline'  => $this->parseTagline(),
-                'runtime'  => $this->parseRuntime(),
-                'premiere' => $this->parsePremiere(),
+                'id'        => $this->detectId(),
+                'type'      => $this->detectType(),
+                'title'     => $this->parseTitle(),
+                'original'  => $this->parseOriginalTitle(),
+                'tagline'   => $this->parseTagline(),
+                'runtime'   => $this->parseRuntime(),
+                'premiere'  => $this->parsePremiere(),
+                'age_limit' => $this->parseAgeLimit(),
+                'mpaa'      => $this->parseMpaaRating(),
             ]);
         }
 
@@ -48,7 +50,9 @@ class FilmDetailsMapper extends Mapper
     {
         try {
             if ($canonical = $this->crawler->filterXPath("//link[@rel='canonical']/@href")->text()) {
-                return collect(explode('/', trim($canonical, '/')))->last();
+                if ($id = intval(collect(explode('/', trim($canonical, '/')))->last())) {
+                    return $id;
+                }
             }
         } catch (\Exception $e) {
             return null;
@@ -142,6 +146,42 @@ class FilmDetailsMapper extends Mapper
     }
 
     /**
+     * @return int|null
+     */
+    private function parseAgeLimit()
+    {
+        try {
+            if ($this->crawler->filter('.ageLimit')->count()) {
+                if (!$classes = $this->crawler->filter('.ageLimit')->attr('class')) {
+                    return null;
+                }
+
+                $class = collect(explode(' ', $classes))->last();
+
+                if (Str::startsWith($class, 'age') && $age = intval(Str::replaceFirst('age', '', $class))) {
+                    return $age;
+                }
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return null|string
+     */
+    private function parseMpaaRating()
+    {
+        try {
+            if ($mpaa = $this->crawler->filterXPath('//*/td[normalize-space(text())="рейтинг MPAA"]/parent::tr/td/a/@href')->text()) {
+                return collect(explode('/', trim($mpaa, '/')))->last();
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
      * @param string $string
      * @return string
      */
@@ -175,7 +215,6 @@ class FilmDetailsMapper extends Mapper
 
         return $tagline;
     }
-
 
     /**
      * @param string $time
