@@ -4,6 +4,10 @@ namespace Siqwell\Kinopoisk\Mappers;
 
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * Class Mapper
+ * @package Siqwell\Kinopoisk\Mappers
+ */
 abstract class Mapper
 {
 
