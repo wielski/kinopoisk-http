@@ -22,19 +22,23 @@ class FilmDetailsMapper extends Mapper
     ];
 
     /**
-     * @return mixed
+     * @return Film|null
      */
     public function get()
     {
-        return new Film([
-            'id'       => $this->detectId(),
-            'type'     => $this->detectType(),
-            'title'    => $this->parseTitle(),
-            'original' => $this->parseOriginalTitle(),
-            'tagline'  => $this->parseTagline(),
-            'runtime'  => $this->parseRuntime(),
-            'premiere' => $this->parsePremiere(),
-        ]);
+        if ($this->detectId()) {
+            return new Film([
+                'id'       => $this->detectId(),
+                'type'     => $this->detectType(),
+                'title'    => $this->parseTitle(),
+                'original' => $this->parseOriginalTitle(),
+                'tagline'  => $this->parseTagline(),
+                'runtime'  => $this->parseRuntime(),
+                'premiere' => $this->parsePremiere(),
+            ]);
+        }
+
+        return null;
     }
 
     /**

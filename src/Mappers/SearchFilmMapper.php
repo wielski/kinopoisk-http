@@ -28,7 +28,7 @@ class SearchFilmMapper extends Mapper
     protected $result;
 
     /**
-     * @return mixed
+     * @return Collection|null
      */
     public function get()
     {
@@ -47,7 +47,7 @@ class SearchFilmMapper extends Mapper
             );
         });
 
-        return $this->result;
+        return $this->result->isNotEmpty() ? $this->result : null;
     }
 
     /**
