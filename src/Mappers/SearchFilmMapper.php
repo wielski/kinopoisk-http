@@ -70,7 +70,7 @@ class SearchFilmMapper extends Mapper
         }
 
         if ($path = $node->attr('title')) {
-            $path = Str::replaceFirst('/sm_film/', '/film_big/', $path);
+            $path = Str::replaceFirst('/sm_film/', '/film/', $path);
 
             return (string)$node->getBaseHref()->withPath($path);
         }
