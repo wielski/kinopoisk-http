@@ -4,6 +4,7 @@ namespace Siqwell\Kinopoisk\Mappers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Siqwell\Kinopoisk\Models\Country;
 use Siqwell\Kinopoisk\Models\Film;
 use Siqwell\Kinopoisk\Models\Genre;
 use Symfony\Component\DomCrawler\Crawler;
@@ -29,6 +30,11 @@ class FilmDetailsMapper extends Mapper
     protected $genres;
 
     /**
+     * @var array
+     */
+    protected $countries;
+
+    /**
      * @return Film|null
      */
     public function get()
@@ -41,6 +47,7 @@ class FilmDetailsMapper extends Mapper
                 'original'  => $this->parseOriginalTitle(),
                 'tagline'   => $this->parseTagline(),
                 'genres'    => $this->parseGenres(),
+                'countries' => $this->parseCountries(),
                 'runtime'   => $this->parseRuntime(),
                 'premiere'  => $this->parsePremiere(),
                 'age_limit' => $this->parseAgeLimit(),
@@ -137,6 +144,27 @@ class FilmDetailsMapper extends Mapper
             });
 
             return $this->genres;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return null|string
+     */
+    private function parseCountries()
+    {
+        try {
+            $this->crawler->filterXPath('//*/td[normalize-space(text())="страна"]/parent::tr/td[last()]/div/a')->each(function (
+                Crawler $node
+            ) {
+                $this->countries[] = new Country([
+                    'id'   => intval(collect(explode('/', trim($node->attr('href'), '/')))->last()),
+                    'name' => $node->text()
+                ]);
+            });
+
+            return $this->countries;
         } catch (\Exception $e) {
             return null;
         }

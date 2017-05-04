@@ -3,10 +3,10 @@
 namespace Siqwell\Kinopoisk\Models;
 
 /**
- * Class Genre
+ * Class Country
  * @package Siqwell\Kinopoisk\Models
  */
-class Genre extends Model
+class Country extends Model
 {
 
     /**
