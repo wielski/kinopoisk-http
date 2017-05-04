@@ -90,7 +90,7 @@ abstract class Api
     /**
      * @param array $variables
      * @param string|null $path
-     * @return string
+     * @return mixed
      */
     protected function get(array $variables = [], string $path = null)
     {
