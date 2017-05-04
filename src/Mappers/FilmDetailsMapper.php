@@ -5,6 +5,8 @@ namespace Siqwell\Kinopoisk\Mappers;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Siqwell\Kinopoisk\Models\Film;
+use Siqwell\Kinopoisk\Models\Genre;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Class Mapper
@@ -22,6 +24,11 @@ class FilmDetailsMapper extends Mapper
     ];
 
     /**
+     * @var array
+     */
+    protected $genres;
+
+    /**
      * @return Film|null
      */
     public function get()
@@ -33,6 +40,7 @@ class FilmDetailsMapper extends Mapper
                 'title'     => $this->parseTitle(),
                 'original'  => $this->parseOriginalTitle(),
                 'tagline'   => $this->parseTagline(),
+                'genres'    => $this->parseGenres(),
                 'runtime'   => $this->parseRuntime(),
                 'premiere'  => $this->parsePremiere(),
                 'age_limit' => $this->parseAgeLimit(),
@@ -110,6 +118,25 @@ class FilmDetailsMapper extends Mapper
             if ($tagline = $this->crawler->filterXPath('//*/td[normalize-space(text())="слоган"]/parent::tr/td[last()]')->text()) {
                 return $this->clearTagline($tagline);
             }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return null|string
+     */
+    private function parseGenres()
+    {
+        try {
+            $this->crawler->filter('span[itemprop=genre] > a')->each(function (Crawler $node) {
+                $this->genres[] = new Genre([
+                    'id'   => intval(collect(explode('/', trim($node->attr('href'), '/')))->last()),
+                    'name' => $node->text()
+                ]);
+            });
+
+            return $this->genres;
         } catch (\Exception $e) {
             return null;
         }
