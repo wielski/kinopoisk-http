@@ -45,6 +45,7 @@ class FilmDetailsMapper extends Mapper
                 'type'      => $this->detectType(),
                 'title'     => $this->parseTitle(),
                 'original'  => $this->parseOriginalTitle(),
+                'poster'    => $this->parsePoster(),
                 'tagline'   => $this->parseTagline(),
                 'genres'    => $this->parseGenres(),
                 'countries' => $this->parseCountries(),
@@ -110,6 +111,22 @@ class FilmDetailsMapper extends Mapper
         try {
             if ($title = $this->crawler->filter('#headerFilm [itemprop="alternativeHeadline"]')->text()) {
                 return $this->clearTitle($title);
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return null|string
+     */
+    private function parsePoster()
+    {
+        try {
+            if ($script = $this->crawler->filter('.film-img-box .popupBigImage')->attr('onclick')) {
+                if (preg_match("/openImgPopup\\('(.+?)'\\)/", $script, $match)) {
+                    return (string)$this->crawler->getBaseHref()->withPath($match[1]);
+                }
             }
         } catch (\Exception $e) {
             return null;
