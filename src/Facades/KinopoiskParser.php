@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Siqwell\Kinopoisk\Apis\FilmApi getFilmApi()
  * @method static \Siqwell\Kinopoisk\Apis\SearchApi getSearchApi()
  * @method static \Siqwell\Kinopoisk\Apis\NameApi getNameApi()
+ * @method static \Siqwell\Kinopoisk\Apis\MetaApi getMetaApi()
  */
 class KinopoiskParser extends Facade
 {

@@ -3,6 +3,7 @@
 namespace Siqwell\Kinopoisk;
 
 use Siqwell\Kinopoisk\Apis\FilmApi;
+use Siqwell\Kinopoisk\Apis\MetaApi;
 use Siqwell\Kinopoisk\Apis\NameApi;
 use Siqwell\Kinopoisk\Apis\SearchApi;
 
@@ -12,7 +13,6 @@ use Siqwell\Kinopoisk\Apis\SearchApi;
  */
 class Client
 {
-
     /**
      * @var HttpClient
      */
@@ -51,5 +51,13 @@ class Client
     public function getNameApi()
     {
         return new NameApi($this->client);
+    }
+
+    /**
+     * @return MetaApi
+     */
+    public function getMetaApi()
+    {
+        return new MetaApi($this->client);
     }
 }
