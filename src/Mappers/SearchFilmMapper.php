@@ -40,7 +40,7 @@ class SearchFilmMapper extends Mapper
                     new Film([
                         'id'       => $this->detectId($node),
                         'url'      => $this->detectUrl($node),
-                        'type'     => $this->detectType($node->filter('.pic a')->attr('data-type')),
+                        'type'     => $this->detectType($node),
                         'title'    => $node->filter('.pic a img')->attr('alt'),
                         'original' => $this->original($node),
                         'poster'   => $this->poster($node->filter('.pic a img')),
@@ -74,13 +74,15 @@ class SearchFilmMapper extends Mapper
     }
 
     /**
-     * @param string $type
+     * @param Crawler $node
      *
-     * @return mixed|null
+     * @return null|string
      */
-    private function detectType(string $type)
+    private function detectType(Crawler $node)
     {
-        return isset($this->types[$type]) ? $this->types[$type] : null;
+        if ($type = $node->filter('.pic a')->attr('data-type')) {
+            return isset($this->types[$type]) ? $this->types[$type] : null;
+        }
     }
 
     /**
