@@ -34,24 +34,27 @@ class SearchFilmMapper extends Mapper
     {
         $this->result = collect();
 
-        $this->crawler->filter('.search_results .element')->each(function (Crawler $node) {
-            $this->result->push(
-                new Film([
-                    'id'       => $node->filter('.pic a')->attr('data-id'),
-                    'type'     => $this->detectType($node->filter('.pic a')->attr('data-type')),
-                    'title'    => $node->filter('.pic a img')->attr('alt'),
-                    'original' => $this->original($node),
-                    'year'     => $node->filter('.info .name .year')->text(),
-                    'poster'   => $this->poster($node->filter('.pic a img')),
-                ])
-            );
-        });
+        if ($this->crawler->filter('.search_results .element')->count()) {
+            $this->crawler->filter('.search_results .element')->each(function (Crawler $node) {
+                $this->result->push(
+                    new Film([
+                        'id'       => $node->filter('.pic a')->attr('data-id'),
+                        'type'     => $this->detectType($node->filter('.pic a')->attr('data-type')),
+                        'title'    => $node->filter('.pic a img')->attr('alt'),
+                        'original' => $this->original($node),
+                        'year'     => $node->filter('.info .name .year')->count() ? $node->filter('.info .name .year')->text() : null,
+                        'poster'   => $this->poster($node->filter('.pic a img')),
+                    ])
+                );
+            });
+        }
 
         return $this->result->isNotEmpty() ? $this->result : null;
     }
 
     /**
      * @param string $type
+     *
      * @return mixed|null
      */
     private function detectType(string $type)
@@ -61,6 +64,7 @@ class SearchFilmMapper extends Mapper
 
     /**
      * @param Crawler $node
+     *
      * @return string|null
      */
     private function poster(Crawler $node)
@@ -80,6 +84,7 @@ class SearchFilmMapper extends Mapper
 
     /**
      * @param Crawler $node
+     *
      * @return null
      */
     private function original(Crawler $node)

@@ -2,6 +2,7 @@
 
 namespace Siqwell\Kinopoisk\Apis;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Uri;
 use Illuminate\Support\Str;
 use Siqwell\Kinopoisk\HttpClient;
@@ -100,7 +101,11 @@ abstract class Api
     {
         $url = $this->getPattern($variables, $path);
 
-        $response = $this->client->get($url);
+        try {
+            $response = $this->client->get($url);
+        } catch (ConnectException $e) {
+            return false;
+        }
 
         if ($response->getStatusCode() != 200) {
             return false;
