@@ -15,7 +15,7 @@ class SearchFilmMapper extends Mapper
 {
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $types = [
         'series' => 'tv',
@@ -38,12 +38,13 @@ class SearchFilmMapper extends Mapper
             $this->crawler->filter('.search_results .element')->each(function (Crawler $node) {
                 $this->result->push(
                     new Film([
-                        'id'       => $node->filter('.pic a')->attr('data-id'),
-                        'type'     => $this->detectType($node->filter('.pic a')->attr('data-type')),
+                        'id'       => $this->detectId($node),
+                        'url'      => $this->detectUrl($node),
+                        'type'     => $this->detectType($node),
                         'title'    => $node->filter('.pic a img')->attr('alt'),
                         'original' => $this->original($node),
-                        'year'     => $node->filter('.info .name .year')->count() ? $node->filter('.info .name .year')->text() : null,
                         'poster'   => $this->poster($node->filter('.pic a img')),
+                        'year'     => $this->year($node),
                     ])
                 );
             });
@@ -53,13 +54,35 @@ class SearchFilmMapper extends Mapper
     }
 
     /**
-     * @param string $type
+     * @param Crawler $node
      *
-     * @return mixed|null
+     * @return int|null
      */
-    private function detectType(string $type)
+    private function detectId(Crawler $node): ?int
     {
-        return isset($this->types[$type]) ? $this->types[$type] : null;
+        return $node->filter('.pic a')->attr('data-id');
+    }
+
+    /**
+     * @param Crawler $node
+     *
+     * @return string
+     */
+    private function detectUrl(Crawler $node): string
+    {
+        return $node->getBaseHref()->withPath('/film/') . $this->detectId($node) . '/';
+    }
+
+    /**
+     * @param Crawler $node
+     *
+     * @return null|string
+     */
+    private function detectType(Crawler $node)
+    {
+        if ($type = $node->filter('.pic a')->attr('data-type')) {
+            return isset($this->types[$type]) ? $this->types[$type] : null;
+        }
     }
 
     /**
@@ -85,7 +108,7 @@ class SearchFilmMapper extends Mapper
     /**
      * @param Crawler $node
      *
-     * @return null
+     * @return string|null
      */
     private function original(Crawler $node)
     {
@@ -100,5 +123,15 @@ class SearchFilmMapper extends Mapper
         }
 
         return null;
+    }
+
+    /**
+     * @param Crawler $node
+     *
+     * @return null|string
+     */
+    private function year(Crawler $node)
+    {
+        return $node->filter('.info .name .year')->count() ? $node->filter('.info .name .year')->text() : null;
     }
 }
