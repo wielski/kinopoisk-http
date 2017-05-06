@@ -25,6 +25,7 @@ class HttpClient extends Client
 
     /**
      * HttpClient constructor.
+     *
      * @param array $config
      */
     public function __construct(array $config = [])
@@ -35,7 +36,7 @@ class HttpClient extends Client
         $stack->push($this->charsetMiddleware(), 'charset');
 
         $config = array_merge([
-            'headers' => [
+            'headers'         => [
                 'Referer'         => 'https://www.kinopoisk.ru/',
                 'User-Agent'      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
                 'Accept'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -50,6 +51,7 @@ class HttpClient extends Client
 
     /**
      * @param int $ttl
+     *
      * @return CacheMiddleware
      */
     protected function cacheMiddleware($ttl = 86400): CacheMiddleware
