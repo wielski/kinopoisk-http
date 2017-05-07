@@ -1,6 +1,7 @@
 {
     "name": "siqwell/kinopoisk",
     "description": "Kinopoisk HTML Parser & Wrapper For Laravel",
+    "keywords": ["laravel", "kinopoisk", "parser", "api"],
     "license": "proprietary",
     "type": "library",
     "authors": [
