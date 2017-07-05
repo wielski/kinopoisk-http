@@ -4,6 +4,7 @@ namespace Siqwell\Kinopoisk\Mappers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Siqwell\Kinopoisk\Models\Company;
 use Siqwell\Kinopoisk\Models\Country;
 use Siqwell\Kinopoisk\Models\Film;
 use Siqwell\Kinopoisk\Models\Genre;
@@ -53,6 +54,7 @@ class FilmDetailsMapper extends Mapper
                 'premiere'  => $this->parsePremiere(),
                 'age_limit' => $this->parseAgeLimit(),
                 'mpaa'      => $this->parseMpaaRating(),
+                'company'   => $this->parseCompany(),
             ]);
         }
 
@@ -254,7 +256,30 @@ class FilmDetailsMapper extends Mapper
     }
 
     /**
+     * @return null|string
+     */
+    private function parseCompany()
+    {
+        try {
+            if ($container = $this->crawler->filterXPath('//*/td[normalize-space(text())="премьера (РФ)"]/parent::tr/td[last()]')) {
+                $id   = $container->filterXPath('//*/a[contains(@href, "company")]/@href')->text();
+                $name = $container->filterXPath('//*/a[contains(@href, "company")]')->text();
+
+                if( Str::contains($id, 'company') && $name ) {
+                    return new Company([
+                        'name' => $name,
+                        'id'   => (int) collect(explode('/', trim($id, '/')))->last()
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
      * @param string $string
+     *
      * @return string
      */
     private function clearTitle(string $string): string
@@ -269,6 +294,7 @@ class FilmDetailsMapper extends Mapper
 
     /**
      * @param string $tagline
+     *
      * @return string|null
      */
     private function clearTagline(string $tagline)
@@ -290,6 +316,7 @@ class FilmDetailsMapper extends Mapper
 
     /**
      * @param string $time
+     *
      * @return string
      */
     private function clearRuntime(string $time)
