@@ -262,14 +262,10 @@ class FilmDetailsMapper extends Mapper
     {
         try {
             if ($container = $this->crawler->filterXPath('//*/td[normalize-space(text())="премьера (РФ)"]/parent::tr/td[last()]')) {
-                $id   = $container->filterXPath('//*/a[contains(@href, "company")]/@href')->text();
-                $name = $container->filterXPath('//*/a[contains(@href, "company")]')->text();
+                $id = $container->filterXPath('//*/a[contains(@href, "company")]/@href')->text();
 
-                if( Str::contains($id, 'company') && $name ) {
-                    return new Company([
-                        'name' => $name,
-                        'id'   => (int) collect(explode('/', trim($id, '/')))->last()
-                    ]);
+                if (Str::contains($id, 'company')) {
+                    return (int)collect(explode('/', trim($id, '/')))->last();
                 }
             }
         } catch (\Exception $e) {
