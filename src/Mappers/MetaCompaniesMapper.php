@@ -30,6 +30,10 @@ class MetaCompaniesMapper extends Mapper
                 return;
             }
 
+            if ($node->attr('value') == 'all') {
+                return;
+            }
+
             $this->companies->push(
                 new Company([
                     'id'   => $node->attr('value'),
