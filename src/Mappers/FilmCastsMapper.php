@@ -107,8 +107,8 @@ class FilmCastsMapper extends Mapper
             'work'        => $work,
             'external_id' => $cast_id,
             'character'   => isset($character) ? $character : null,
-            'name_ru'     => ($original && $localized) ? $localized : $original,
-            'name_en'     => $original ? $original : $localized,
+            'name_ru'     => $localized ? $localized : null,
+            'name_en'     => $original ? $original : null,
         ]));
     }
 
