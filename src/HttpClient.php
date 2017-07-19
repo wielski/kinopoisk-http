@@ -27,12 +27,16 @@ class HttpClient extends Client
      * HttpClient constructor.
      *
      * @param array $config
+     * @param bool  $cache
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], $cache = false)
     {
         $stack = HandlerStack::create();
 
-        $stack->push($this->cacheMiddleware(), 'cache');
+        if ($cache) {
+            $stack->push($this->cacheMiddleware(), 'cache');
+        }
+
         $stack->push($this->charsetMiddleware(), 'charset');
 
         $config = array_merge([

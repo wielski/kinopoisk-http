@@ -24,7 +24,11 @@ class Client
     function __construct()
     {
         $this->client = new HttpClient(
-            array_merge(config('services.kinopoisk'), ['base_uri' => 'https://www.kinopoisk.ru/'])
+            array_merge(
+                config('services.kinopoisk.client'),
+                ['base_uri' => 'https://www.kinopoisk.ru/']
+            ),
+            config('services.kinopoisk.cache')
         );
     }
 
