@@ -68,8 +68,8 @@ class FilmDetailsMapper extends Mapper
     {
         try {
             if ($canonical = $this->crawler->filterXPath("//link[@rel='canonical']/@href")->text()) {
-                if ($id = intval(collect(explode('/', trim($canonical, '/')))->last())) {
-                    return $id;
+                if(preg_match('#\/film\/.+?\-([0-9]+)\/$#', $canonical, $match)){
+                    return intval($match[1]);
                 }
             }
         } catch (\Exception $e) {
