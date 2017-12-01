@@ -1,6 +1,7 @@
 {
     "name": "siqwell/kinopoisk",
-    "description": "Kinopoisk API Wrapper For Laravel",
+    "description": "Kinopoisk HTML Parser & Wrapper For Laravel",
+    "keywords": ["laravel", "kinopoisk", "parser", "api"],
     "license": "proprietary",
     "type": "library",
     "authors": [
@@ -16,5 +17,10 @@
         "phlib/guzzle-middleware": "^1.0",
         "symfony/dom-crawler": "^3.2",
         "illuminate/support": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Siqwell\\Kinopoisk\\": "src/"
+        }
     }
 }

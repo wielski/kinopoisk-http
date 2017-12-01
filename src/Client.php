@@ -2,6 +2,9 @@
 
 namespace Siqwell\Kinopoisk;
 
+use Siqwell\Kinopoisk\Apis\FilmApi;
+use Siqwell\Kinopoisk\Apis\MetaApi;
+use Siqwell\Kinopoisk\Apis\NameApi;
 use Siqwell\Kinopoisk\Apis\SearchApi;
 
 /**
@@ -10,7 +13,6 @@ use Siqwell\Kinopoisk\Apis\SearchApi;
  */
 class Client
 {
-
     /**
      * @var HttpClient
      */
@@ -21,10 +23,13 @@ class Client
      */
     function __construct()
     {
-        $this->client = new HttpClient([
-            'base_uri' => 'https://www.kinopoisk.ru/',
-            'timeout'  => 10,
-        ]);
+        $this->client = new HttpClient(
+            array_merge(
+                config('services.kinopoisk.client'),
+                ['base_uri' => 'https://www.kinopoisk.ru/']
+            ),
+            config('services.kinopoisk.cache')
+        );
     }
 
     /**
@@ -33,5 +38,29 @@ class Client
     public function getSearchApi()
     {
         return new SearchApi($this->client);
+    }
+
+    /**
+     * @return FilmApi
+     */
+    public function getFilmApi()
+    {
+        return new FilmApi($this->client);
+    }
+
+    /**
+     * @return NameApi
+     */
+    public function getNameApi()
+    {
+        return new NameApi($this->client);
+    }
+
+    /**
+     * @return MetaApi
+     */
+    public function getMetaApi()
+    {
+        return new MetaApi($this->client);
     }
 }

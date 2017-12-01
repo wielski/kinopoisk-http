@@ -2,6 +2,7 @@
 
 namespace Siqwell\Kinopoisk\Apis;
 
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Uri;
 use Illuminate\Support\Str;
 use Siqwell\Kinopoisk\HttpClient;
@@ -31,6 +32,7 @@ abstract class Api
 
     /**
      * Api constructor.
+     *
      * @param HttpClient $client
      */
     function __construct(HttpClient $client)
@@ -40,6 +42,7 @@ abstract class Api
 
     /**
      * @param string|\Closure $mapper
+     *
      * @return $this
      */
     public function setMapper($mapper)
@@ -58,8 +61,9 @@ abstract class Api
     }
 
     /**
-     * @param $result
+     * @param      $result
      * @param null $url
+     *
      * @return mixed
      */
     public function callMap($result, $url = null)
@@ -88,30 +92,54 @@ abstract class Api
     }
 
     /**
-     * @param array $variables
+     * @param array       $variables
      * @param string|null $path
-     * @return string
+     *
+     * @return mixed
      */
     protected function get(array $variables = [], string $path = null)
     {
         $url = $this->getPattern($variables, $path);
 
-        $response = $this->client->get($url);
+        try {
+            $response = $this->client->get($url);
+        } catch (ConnectException $e) {
+            return false;
+        }
 
         if ($response->getStatusCode() != 200) {
             return false;
         }
 
-        if ($content = $response->getBody()->getContents()) {
-            return $this->isMapped() ? $this->callMap($content, $url) : $content;
+        if (!$content = $response->getBody()->getContents()) {
+            return false;
         }
 
-        return false;
+        if (!$content = $this->checkContent($content)) {
+            return false;
+        }
+
+        return $this->isMapped() ? $this->callMap($content, $url) : $content;
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return string|bool
+     */
+    protected function checkContent(string $content)
+    {
+        if (Str::contains($content, 'captchaSound')) {
+            return false;
+        }
+
+        return $content;
     }
 
     /**
      * @param array $variables
-     * @param null $pattern
+     * @param null  $pattern
+     *
      * @return mixed
      */
     protected function getPattern(array $variables = [], $pattern = null)
